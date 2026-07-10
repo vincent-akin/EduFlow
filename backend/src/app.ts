@@ -5,7 +5,6 @@ import { env } from './config/env.js';
 import { loggingMiddleware } from './middlewares/logging.middleware.js';
 import { rateLimiter } from './middlewares/rate-limit.middleware.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
-import logger from './utils/logger.js';
 
 const app = express();
 
@@ -27,7 +26,7 @@ app.use(loggingMiddleware);
 app.use(rateLimiter);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({
     success: true,
     message: 'EduFlow API is running',
