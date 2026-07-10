@@ -1,3 +1,4 @@
+// src/config/env.ts
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
@@ -19,6 +20,7 @@ const envSchema = z.object({
     RATE_LIMIT_WINDOW_MS: z.string().default('900000'),
     RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+    FRONTEND_URL: z.string().default('http://localhost:3000'),
 });
 
 const parsed = envSchema.safeParse(process.env);
