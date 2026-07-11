@@ -7,6 +7,8 @@ import { rateLimiter } from './middlewares/rate-limit.middleware.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 
 import schoolRoutes from './modules/schools/school.routes.js';
+import authRoutes from './modules/auth/auth.routes.js';
+import sessionRoutes from './modules/sessions/session.routes.js';
 
 const app = express();
 
@@ -38,7 +40,9 @@ app.get('/health', (_req, res) => {
 });
 
 // Routes will be registered here
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/schools', schoolRoutes);
+app.use('/api/v1/sessions', sessionRoutes);
 // app.use('/api/v1/auth', authRoutes);
 // etc.
 
