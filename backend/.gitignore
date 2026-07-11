@@ -164,7 +164,7 @@ reports/
 exports/
 
 # Session files
-sessions/
+#sessions
 
 # SSL certificates
 *.pem
