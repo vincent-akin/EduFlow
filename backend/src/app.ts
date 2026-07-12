@@ -22,24 +22,24 @@ import auditRoutes from './modules/audit/audit.routes.js';
 
 const app = express();
 
-// Security middleware
+// ============ Security Middleware ============
 app.use(helmet());
 app.use(cors({
   origin: env.NODE_ENV === 'production' ? env.FRONTEND_URL : '*',
   credentials: true,
 }));
 
-// Request parsing
+// ============ Request Parsing ============
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Logging
+// ============ Logging ============
 app.use(loggingMiddleware);
 
-// Rate limiting
+// ============ Rate Limiting ============
 app.use(rateLimiter);
 
-// Health check
+// ============ Health Check ============
 app.get('/health', (_req, res) => {
   res.status(200).json({
     success: true,
@@ -49,8 +49,11 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// API Routes
+// ============ API Routes ============
+// Public routes
 app.use('/api/v1/auth', authRoutes);
+
+// Protected routes (require authentication)
 app.use('/api/v1/schools', schoolRoutes);
 app.use('/api/v1/sessions', sessionRoutes);
 app.use('/api/v1/classes', classRoutes);
@@ -63,15 +66,15 @@ app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/audit', auditRoutes);
 
-// Error handling
-app.use(errorMiddleware);
-
-// 404 handler
+// ============ 404 Handler ============
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: `Route ${req.method} ${req.path} not found`,
   });
 });
+
+// ============ Error Handler ============
+app.use(errorMiddleware);
 
 export default app;

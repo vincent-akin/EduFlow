@@ -12,13 +12,18 @@
         "#config/*": "./src/config/*",
         "#middlewares/*": "./src/middlewares/*"
     },
+    
     "scripts": {
-        "dev": "nodemon --exec node --import tsx src/server.ts",
-        "start": "node dist/server.js",
+        "dev": "node --import tsx src/server.ts",
+        "dev:watch": "nodemon --exec \"node --import tsx src/server.ts\"",
         "build": "tsc -p tsconfig.build.json",
-        "test": "node --import tsx src/test-logger.ts",
+        "start": "node dist/server.js",
         "lint": "eslint . --ext .ts",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "seed": "node --import tsx scripts/seed.ts",
+        "db:drop": "node --import tsx scripts/drop-database.ts"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
