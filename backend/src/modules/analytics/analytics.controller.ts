@@ -1,0 +1,63 @@
+import { Request, Response } from 'express';
+import {
+  getStudentAnalytics,
+  getClassAnalytics,
+  getSubjectAnalytics,
+  getAssessmentAnalytics,
+  getDashboardAnalytics,
+} from './analytics.service.js';
+import { ResponseHelper } from '../../shared/helpers/response.helper.js';
+import { Types } from 'mongoose';
+
+export const getStudentAnalyticsController = async (req: Request, res: Response): Promise<Response> => {
+  const { studentId } = req.params;
+  if (!studentId) {
+    return ResponseHelper.error(res, 'Student ID is required', 400);
+  }
+  const schoolId = (req as any).schoolId;
+  const analytics = await getStudentAnalytics(new Types.ObjectId(studentId), schoolId);
+  return ResponseHelper.success(res, analytics, 'Student analytics retrieved successfully');
+};
+
+export const getMyAnalyticsController = async (req: Request, res: Response): Promise<Response> => {
+  const studentId = (req as any).user.id;
+  const schoolId = (req as any).schoolId;
+  const analytics = await getStudentAnalytics(studentId, schoolId);
+  return ResponseHelper.success(res, analytics, 'My analytics retrieved successfully');
+};
+
+export const getClassAnalyticsController = async (req: Request, res: Response): Promise<Response> => {
+  const { classId } = req.params;
+  if (!classId) {
+    return ResponseHelper.error(res, 'Class ID is required', 400);
+  }
+  const schoolId = (req as any).schoolId;
+  const analytics = await getClassAnalytics(new Types.ObjectId(classId), schoolId);
+  return ResponseHelper.success(res, analytics, 'Class analytics retrieved successfully');
+};
+
+export const getSubjectAnalyticsController = async (req: Request, res: Response): Promise<Response> => {
+  const { subjectId } = req.params;
+  if (!subjectId) {
+    return ResponseHelper.error(res, 'Subject ID is required', 400);
+  }
+  const schoolId = (req as any).schoolId;
+  const analytics = await getSubjectAnalytics(new Types.ObjectId(subjectId), schoolId);
+  return ResponseHelper.success(res, analytics, 'Subject analytics retrieved successfully');
+};
+
+export const getAssessmentAnalyticsController = async (req: Request, res: Response): Promise<Response> => {
+  const { assessmentId } = req.params;
+  if (!assessmentId) {
+    return ResponseHelper.error(res, 'Assessment ID is required', 400);
+  }
+  const schoolId = (req as any).schoolId;
+  const analytics = await getAssessmentAnalytics(new Types.ObjectId(assessmentId), schoolId);
+  return ResponseHelper.success(res, analytics, 'Assessment analytics retrieved successfully');
+};
+
+export const getDashboardAnalyticsController = async (req: Request, res: Response): Promise<Response> => {
+  const schoolId = (req as any).schoolId;
+  const analytics = await getDashboardAnalytics(schoolId);
+  return ResponseHelper.success(res, analytics, 'Dashboard analytics retrieved successfully');
+};

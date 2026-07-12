@@ -16,6 +16,7 @@ import questionRoutes from './modules/questions/question.routes.js';
 import assessmentRoutes from './modules/assessments/assessment.routes.js';
 import submissionRoutes from './modules/submissions/submission.routes.js';
 import resultRoutes from './modules/results/result.routes.js';
+import analyticsRoutes from './modules/analytics/analytics.routes.js';
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use('/api/v1/questions', questionRoutes);
 app.use('/api/v1/assessments', assessmentRoutes);
 app.use('/api/v1/submissions', submissionRoutes);
 app.use('/api/v1/results', resultRoutes);
+app.use('/api/v1/analytics', analyticsRoutes);
 
 // Error handling
 app.use(errorMiddleware);
