@@ -28,6 +28,7 @@ import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 import roleRoutes from './modules/roles/role.routes.js';
 import importExportRoutes from './modules/import-export/import-export.routes.js';
 import calendarRoutes from './modules/calendar/calendar.routes.js';
+import messageRoutes from './modules/messages/message.routes.js';
 
 
 
@@ -85,6 +86,7 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/import-export', importExportRoutes);
 app.use('/api/v1/calendar', calendarRoutes);
+app.use('/api/v1/messages', messageRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {
