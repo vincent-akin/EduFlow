@@ -29,6 +29,7 @@ import roleRoutes from './modules/roles/role.routes.js';
 import importExportRoutes from './modules/import-export/import-export.routes.js';
 import calendarRoutes from './modules/calendar/calendar.routes.js';
 import messageRoutes from './modules/messages/message.routes.js';
+import notificationSettingsRoutes from './modules/notification-settings/notification-settings.routes.js';
 
 
 
@@ -87,6 +88,7 @@ app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/import-export', importExportRoutes);
 app.use('/api/v1/calendar', calendarRoutes);
 app.use('/api/v1/messages', messageRoutes);
+app.use('/api/v1/notification-settings', notificationSettingsRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {
