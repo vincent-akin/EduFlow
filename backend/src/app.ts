@@ -27,6 +27,7 @@ import fileRoutes from './modules/files/file.routes.js';
 import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 import roleRoutes from './modules/roles/role.routes.js';
 import importExportRoutes from './modules/import-export/import-export.routes.js';
+import calendarRoutes from './modules/calendar/calendar.routes.js';
 
 
 
@@ -77,13 +78,13 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/billing', billingRoutes);
 app.use('/api/v1/ai', aiRoutes);
-// Add these routes
 app.use('/api/v1/parents', parentRoutes);
 app.use('/api/v1/attendance', attendanceRoutes);
 app.use('/api/v1/files', fileRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/import-export', importExportRoutes);
+app.use('/api/v1/calendar', calendarRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {
