@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { BaseTenantSoftDeleteSchema } from '../../shared/models/base.model.js';
+import { BaseSoftDeleteSchema } from '../../shared/models/base.model.js';
 import { SoftDeleteDocument } from '../../shared/interfaces/base.interface.js';
 
 export interface ISchool extends SoftDeleteDocument {
@@ -30,7 +30,7 @@ export interface ISchool extends SoftDeleteDocument {
 
 const SchoolSchema = new Schema<ISchool>(
   {
-    ...BaseTenantSoftDeleteSchema,
+    ...BaseSoftDeleteSchema,
     name: {
       type: String,
       required: true,
@@ -129,7 +129,7 @@ const SchoolSchema = new Schema<ISchool>(
   }
 );
 
-SchoolSchema.index({ slug: 1 }, { unique: true });
+//SchoolSchema.index({ slug: 1 }, { unique: true });
 SchoolSchema.index({ name: 1 });
 SchoolSchema.index({ isActive: 1 });
 

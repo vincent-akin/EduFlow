@@ -9,7 +9,7 @@ const ResultSchema = new Schema<IResult>(
       type: Schema.Types.ObjectId,
       ref: 'School',
       required: true,
-      index: true,
+      
     },
     submissionId: {
       type: Schema.Types.ObjectId,

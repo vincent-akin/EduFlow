@@ -67,6 +67,6 @@ const StudentProfileSchema = new Schema<IStudentProfile>(
 StudentProfileSchema.index({ schoolId: 1 });
 StudentProfileSchema.index({ schoolId: 1, admissionNumber: 1 }, { unique: true });
 StudentProfileSchema.index({ classId: 1 });
-StudentProfileSchema.index({ userId: 1 }, { unique: true });
+//StudentProfileSchema.index({ userId: 1 }, { unique: true });
 
 export const StudentProfile = mongoose.model<IStudentProfile>('StudentProfile', StudentProfileSchema);

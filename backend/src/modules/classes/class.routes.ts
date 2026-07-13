@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import {
-    createClass,
-    getClassById,
-    getAllClasses,
-    updateClass,
-    deleteClass,
-    getClassesByTeacher,
+  createClassController,
+  getClassByIdController,
+  getAllClassesController,
+  updateClassController,
+  deleteClassController,
+  getClassesByTeacherController,
 } from './class.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { rbacMiddleware } from '../../middlewares/rbac.middleware.js';
@@ -19,37 +19,37 @@ const router = Router();
 router.use(authMiddleware, tenantMiddleware);
 
 // Routes accessible by teachers and admins
-router.get('/', getAllClasses);
+router.get('/', getAllClassesController);
 
 // Routes for school admin only
 router.post(
-    '/',
-    rbacMiddleware(['school_admin']),
-    validate(createClassSchema),
-    createClass
+  '/',
+  rbacMiddleware(['school_admin']),
+  validate(createClassSchema),
+  createClassController
 );
 
 router.get(
-    '/teacher/:teacherId',
-    getClassesByTeacher
+  '/teacher/:teacherId',
+  getClassesByTeacherController
 );
 
 router.get(
-    '/:id',
-    getClassById
+  '/:id',
+  getClassByIdController
 );
 
 router.put(
-    '/:id',
-    rbacMiddleware(['school_admin']),
-    validate(updateClassSchema),
-    updateClass
+  '/:id',
+  rbacMiddleware(['school_admin']),
+  validate(updateClassSchema),
+  updateClassController
 );
 
 router.delete(
-    '/:id',
-    rbacMiddleware(['school_admin']),
-    deleteClass
+  '/:id',
+  rbacMiddleware(['school_admin']),
+  deleteClassController
 );
 
 export default router;

@@ -19,6 +19,8 @@ import resultRoutes from './modules/results/result.routes.js';
 import analyticsRoutes from './modules/analytics/analytics.routes.js';
 import notificationRoutes from './modules/notifications/notification.routes.js';
 import auditRoutes from './modules/audit/audit.routes.js';
+import aiRoutes from './modules/ai/ai.routes.js';
+import billingRoutes from './modules/billing/billing.routes.js';
 
 const app = express();
 
@@ -65,6 +67,8 @@ app.use('/api/v1/results', resultRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/audit', auditRoutes);
+app.use('/api/v1/billing', billingRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {

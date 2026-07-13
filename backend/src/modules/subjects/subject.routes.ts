@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import {
-    createSubject,
-    getSubjectById,
-    getAllSubjects,
-    updateSubject,
-    deleteSubject,
-    getSubjectsByClass,
-    getCoreSubjects,
+  createSubjectController,
+  getSubjectByIdController,
+  getAllSubjectsController,
+  updateSubjectController,
+  deleteSubjectController,
+  getSubjectsByClassController,
+  getCoreSubjectsController,
 } from './subject.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { rbacMiddleware } from '../../middlewares/rbac.middleware.js';
@@ -15,43 +15,39 @@ import { validate } from '../../middlewares/validation.middleware.js';
 import { createSubjectSchema, updateSubjectSchema } from './subject.validators.js';
 
 const router = Router();
-
-// All routes require authentication and tenant
 router.use(authMiddleware, tenantMiddleware);
 
-// Routes accessible by teachers and admins
-router.get('/', getAllSubjects);
-router.get('/core', getCoreSubjects);
+router.get('/', getAllSubjectsController);
+router.get('/core', getCoreSubjectsController);
 
-// Routes for school admin only
 router.post(
-    '/',
-    rbacMiddleware(['school_admin']),
-    validate(createSubjectSchema),
-    createSubject
+  '/',
+  rbacMiddleware(['school_admin']),
+  validate(createSubjectSchema),
+  createSubjectController
 );
 
 router.get(
-    '/class/:classId',
-    getSubjectsByClass
+  '/class/:classId',
+  getSubjectsByClassController
 );
 
 router.get(
-    '/:id',
-    getSubjectById
+  '/:id',
+  getSubjectByIdController
 );
 
 router.put(
-    '/:id',
-    rbacMiddleware(['school_admin']),
-    validate(updateSubjectSchema),
-    updateSubject
+  '/:id',
+  rbacMiddleware(['school_admin']),
+  validate(updateSubjectSchema),
+  updateSubjectController
 );
 
 router.delete(
-    '/:id',
-    rbacMiddleware(['school_admin']),
-    deleteSubject
+  '/:id',
+  rbacMiddleware(['school_admin']),
+  deleteSubjectController
 );
 
 export default router;

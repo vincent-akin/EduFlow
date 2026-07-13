@@ -9,7 +9,7 @@ const SubmissionSchema = new Schema<ISubmission>(
             type: Schema.Types.ObjectId,
             ref: 'School',
             required: true,
-            index: true,
+            
         },
         assessmentId: {
             type: Schema.Types.ObjectId,

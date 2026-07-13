@@ -55,6 +55,6 @@ const TeacherProfileSchema = new Schema<ITeacherProfile>(
 
 TeacherProfileSchema.index({ schoolId: 1 });
 TeacherProfileSchema.index({ schoolId: 1, employeeId: 1 }, { unique: true });
-TeacherProfileSchema.index({ userId: 1 }, { unique: true });
+//TeacherProfileSchema.index({ userId: 1 }, { unique: true });
 
 export const TeacherProfile = mongoose.model<ITeacherProfile>('TeacherProfile', TeacherProfileSchema);

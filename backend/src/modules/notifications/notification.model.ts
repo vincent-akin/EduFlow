@@ -9,13 +9,13 @@ const NotificationSchema = new Schema<INotification>(
       type: Schema.Types.ObjectId,
       ref: 'School',
       required: true,
-      index: true,
+      
     },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
+      
     },
     title: {
       type: String,
@@ -54,6 +54,7 @@ const NotificationSchema = new Schema<INotification>(
   }
 );
 
+NotificationSchema.index({ schoolId: 1 });
 NotificationSchema.index({ schoolId: 1, userId: 1 });
 NotificationSchema.index({ userId: 1, isRead: 1 });
 NotificationSchema.index({ createdAt: -1 });

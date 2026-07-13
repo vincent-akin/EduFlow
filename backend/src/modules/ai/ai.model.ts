@@ -9,13 +9,13 @@ const AIGenerationSchema = new Schema<IAIGeneration>(
       type: Schema.Types.ObjectId,
       ref: 'School',
       required: true,
-      index: true,
+      
     },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
+      
     },
     provider: {
       type: String,
