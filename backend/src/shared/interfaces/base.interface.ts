@@ -46,8 +46,8 @@ export interface IUser extends SoftDeleteDocument {
     emailVerified: boolean;
     isActive: boolean;
     lastLoginAt: Date | null;
-    resetPasswordToken: string | null;  // ✅ Add this
-    resetPasswordExpires: Date | null;  // ✅ Add this
+    resetPasswordToken: string | null;  
+    resetPasswordExpires: Date | null; 
 }
 
 export interface ITeacherProfile extends SoftDeleteDocument {
@@ -418,6 +418,41 @@ export interface JwtPayload {
     role: 'school_admin' | 'teacher' | 'student';
     iat?: number;
     exp?: number;
+}
+
+// ============================================
+// Support Ticket Interfaces
+// ============================================
+
+export interface ISupportTicket extends SoftDeleteDocument {
+  userId: Types.ObjectId;
+  subject: string;
+  message: string;
+  category: 'technical' | 'academic' | 'billing' | 'general' | 'feature_request' | 'bug_report';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  assignedTo?: Types.ObjectId;
+  responses: {
+    userId: Types.ObjectId;
+    message: string;
+    isStaff: boolean;
+    createdAt: Date;
+  }[];
+  resolvedAt?: Date;
+  closedAt?: Date;
+  rating?: number;
+  feedback?: string;
+}
+
+export interface IFaq extends SoftDeleteDocument {
+  question: string;
+  answer: string;
+  category: 'general' | 'academic' | 'technical' | 'billing' | 'account' | 'assessment';
+  order: number;
+  isPublished: boolean;
+  views: number;
+  helpful: number;
+  notHelpful: number;
 }
 
 // ============================================

@@ -15,7 +15,7 @@ const UserSchema = new Schema<IUser>(
             required: true,
             trim: true,
         },
-            fullName: {
+        fullName: {
             type: String,
             required: true,
             trim: true,
@@ -56,7 +56,7 @@ const UserSchema = new Schema<IUser>(
             type: Date,
             default: null,
         },
-        // ✅ Add these for password reset functionality
+        //for password reset functionality
         resetPasswordToken: {
             type: String,
             default: null,

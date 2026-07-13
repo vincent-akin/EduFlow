@@ -30,6 +30,7 @@ import importExportRoutes from './modules/import-export/import-export.routes.js'
 import calendarRoutes from './modules/calendar/calendar.routes.js';
 import messageRoutes from './modules/messages/message.routes.js';
 import notificationSettingsRoutes from './modules/notification-settings/notification-settings.routes.js';
+import supportRoutes from './modules/support/support.routes.js';
 
 
 
@@ -89,6 +90,7 @@ app.use('/api/v1/import-export', importExportRoutes);
 app.use('/api/v1/calendar', calendarRoutes);
 app.use('/api/v1/messages', messageRoutes);
 app.use('/api/v1/notification-settings', notificationSettingsRoutes);
+app.use('/api/v1/support', supportRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {
