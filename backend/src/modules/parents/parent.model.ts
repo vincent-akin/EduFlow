@@ -55,7 +55,7 @@ const ParentSchema = new Schema<IParent>(
 );
 
 ParentSchema.index({ schoolId: 1 });
-ParentSchema.index({ userId: 1 }, { unique: true });
+//ParentSchema.index({ userId: 1 }, { unique: true });
 ParentSchema.index({ children: 1 });
 
 export const Parent = mongoose.model<IParent>('Parent', ParentSchema);

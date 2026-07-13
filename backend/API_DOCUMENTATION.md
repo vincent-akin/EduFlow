@@ -1,12 +1,10 @@
 # EduFlow Backend - Complete API Documentation
 
-Here's the complete API documentation for the frontend engineer.
+**Version:** 2.0  
+**Base URL:** `http://localhost:5000/api/v1`  
+**Last Updated:** July 2026
 
-## Base URL
-
-```
-http://localhost:5000/api/v1
-```
+---
 
 ## Authentication
 
@@ -15,6 +13,14 @@ All endpoints except `/auth/*` require a Bearer token in the Authorization heade
 ```
 Authorization: Bearer <access_token>
 ```
+
+### Authentication Flow
+
+1. **Register** user via `/auth/register`
+2. **Login** via `/auth/login` to get `accessToken` and `refreshToken`
+3. **Include** `accessToken` in `Authorization: Bearer <token>` header for protected endpoints
+4. **Refresh** token via `/auth/refresh-token` when `accessToken` expires
+5. **Logout** by discarding tokens on client side
 
 ---
 
@@ -34,7 +40,7 @@ POST /auth/register
   "lastName": "Doe",
   "email": "john@example.com",
   "password": "password123",
-  "role": "school_admin", // or "teacher" or "student"
+  "role": "school_admin",
   "schoolId": "65f8a1b2c3d4e5f6a7b8c9d0"
 }
 ```
@@ -123,17 +129,149 @@ POST /auth/refresh-token
 
 ---
 
+### Forgot Password
+
+```http
+POST /auth/forgot-password
+```
+
+**Request Body:**
+
+```json
+{
+  "email": "john@example.com"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Password reset email sent",
+  "data": {
+    "message": "If your email exists, you will receive a reset link"
+  }
+}
+```
+
+---
+
+### Reset Password
+
+```http
+POST /auth/reset-password
+```
+
+**Request Body:**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "newPassword": "newpassword123"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Password reset successful",
+  "data": {
+    "message": "Password reset successful"
+  }
+}
+```
+
+---
+
+### Change Password
+
+```http
+PATCH /auth/change-password
+```
+
+**Headers:** `Authorization: Bearer <access_token>`
+
+**Request Body:**
+
+```json
+{
+  "currentPassword": "password123",
+  "newPassword": "newpassword123"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Password changed successfully",
+  "data": {
+    "message": "Password changed successfully"
+  }
+}
+```
+
+---
+
+### Verify Email
+
+```http
+GET /auth/verify/:token
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Email verified successfully",
+  "data": {
+    "message": "Email verified successfully"
+  }
+}
+```
+
+---
+
+### Resend Verification
+
+```http
+POST /auth/resend-verification
+```
+
+**Request Body:**
+
+```json
+{
+  "email": "john@example.com"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Verification email sent",
+  "data": {
+    "message": "Verification email sent"
+  }
+}
+```
+
+---
+
 ### Get Current User Profile
 
 ```http
 GET /auth/me
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
+**Headers:** `Authorization: Bearer <access_token>`
 
 **Response:**
 
@@ -142,13 +280,35 @@ Authorization: Bearer <access_token>
   "success": true,
   "message": "User profile retrieved",
   "data": {
-    "id": "...",
+    "_id": "...",
     "firstName": "John",
     "lastName": "Doe",
     "email": "john@example.com",
     "role": "school_admin",
-    "schoolId": "..."
+    "schoolId": "...",
+    "emailVerified": true,
+    "isActive": true
   }
+}
+```
+
+---
+
+### Logout
+
+```http
+POST /auth/logout
+```
+
+**Headers:** `Authorization: Bearer <access_token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Logged out successfully",
+  "data": null
 }
 ```
 
@@ -191,6 +351,16 @@ POST /schools
 }
 ```
 
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "School created successfully",
+  "data": { ... }
+}
+```
+
 ---
 
 ### Get All Schools
@@ -200,6 +370,13 @@ GET /schools?page=1&limit=10
 ```
 
 **Roles:** `school_admin`
+
+**Query Parameters:**
+
+| Parameter | Type   | Description                  |
+| --------- | ------ | ---------------------------- |
+| page      | number | Page number (default: 1)     |
+| limit     | number | Items per page (default: 10) |
 
 ---
 
@@ -231,9 +408,22 @@ PUT /schools/:id
 
 **Roles:** `school_admin`
 
+**Request Body:** (partial update)
+
+```json
+{
+  "name": "Updated School Name",
+  "settings": {
+    "branding": {
+      "primaryColor": "#FF0000"
+    }
+  }
+}
+```
+
 ---
 
-### Delete School (Soft Delete)
+### Delete School
 
 ```http
 DELETE /schools/:id
@@ -252,6 +442,15 @@ GET /users?page=1&limit=10&role=teacher&isActive=true
 ```
 
 **Roles:** `school_admin`
+
+**Query Parameters:**
+
+| Parameter | Type    | Description             |
+| --------- | ------- | ----------------------- |
+| page      | number  | Page number             |
+| limit     | number  | Items per page          |
+| role      | string  | Filter by role          |
+| isActive  | boolean | Filter by active status |
 
 ---
 
@@ -473,7 +672,109 @@ DELETE /teachers/:id
 
 ---
 
-## 6. ACADEMIC SESSION ENDPOINTS
+## 6. PARENT ENDPOINTS
+
+### Get My Parent Profile
+
+```http
+GET /parents/me
+```
+
+**Roles:** `parent`
+
+---
+
+### Get All Parents
+
+```http
+GET /parents?page=1&limit=10
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Parent by ID
+
+```http
+GET /parents/:id
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Create Parent
+
+```http
+POST /parents
+```
+
+**Roles:** `school_admin`
+
+**Request Body:**
+
+```json
+{
+  "userId": "...",
+  "phone": "+2348001234567",
+  "address": "123 Parent Street",
+  "occupation": "Engineer"
+}
+```
+
+---
+
+### Update Parent
+
+```http
+PUT /parents/:id
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Delete Parent
+
+```http
+DELETE /parents/:id
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Get My Children
+
+```http
+GET /parents/children
+```
+
+**Roles:** `parent`
+
+---
+
+### Link Child to Parent
+
+```http
+POST /parents/link-child
+```
+
+**Roles:** `school_admin`
+
+**Request Body:**
+
+```json
+{
+  "parentId": "...",
+  "studentId": "..."
+}
+```
+
+---
+
+## 7. ACADEMIC SESSION ENDPOINTS
 
 ### Create Session
 
@@ -546,7 +847,7 @@ DELETE /sessions/sessions/:id
 
 ---
 
-## 7. ACADEMIC TERM ENDPOINTS
+## 8. ACADEMIC TERM ENDPOINTS
 
 ### Create Term
 
@@ -621,7 +922,7 @@ DELETE /sessions/terms/:id
 
 ---
 
-## 8. CLASS ENDPOINTS
+## 9. CLASS ENDPOINTS
 
 ### Create Class
 
@@ -671,7 +972,7 @@ GET /classes/teacher/:teacherId
 GET /classes/:id
 ```
 
-**Roles:** `school_admin`, `teacher`
+**Roles:** `school_admin`, `teacher`, `student`
 
 ---
 
@@ -695,7 +996,7 @@ DELETE /classes/:id
 
 ---
 
-## 9. SUBJECT ENDPOINTS
+## 10. SUBJECT ENDPOINTS
 
 ### Create Subject
 
@@ -726,7 +1027,7 @@ POST /subjects
 GET /subjects?page=1&limit=10&isCore=true&isActive=true
 ```
 
-**Roles:** `school_admin`, `teacher`
+**Roles:** `school_admin`, `teacher`, `student`
 
 ---
 
@@ -736,7 +1037,7 @@ GET /subjects?page=1&limit=10&isCore=true&isActive=true
 GET /subjects/core
 ```
 
-**Roles:** `school_admin`, `teacher`
+**Roles:** `school_admin`, `teacher`, `student`
 
 ---
 
@@ -780,9 +1081,9 @@ DELETE /subjects/:id
 
 ---
 
-## 10. QUESTION ENDPOINTS
+## 11. QUESTION ENDPOINTS
 
-### Create Question
+### Create MCQ Question
 
 ```http
 POST /questions
@@ -790,7 +1091,7 @@ POST /questions
 
 **Roles:** `school_admin`, `teacher`
 
-**Request Body (MCQ):**
+**Request Body:**
 
 ```json
 {
@@ -815,7 +1116,15 @@ POST /questions
 }
 ```
 
-**Request Body (Theory):**
+---
+
+### Create Theory Question
+
+```http
+POST /questions
+```
+
+**Request Body:**
 
 ```json
 {
@@ -843,6 +1152,18 @@ GET /questions?page=1&limit=10&subjectId=...&type=mcq&difficulty=medium&topic=Al
 ```
 
 **Roles:** `school_admin`, `teacher`
+
+**Query Parameters:**
+
+| Parameter  | Type    | Description                             |
+| ---------- | ------- | --------------------------------------- |
+| page       | number  | Page number                             |
+| limit      | number  | Items per page                          |
+| subjectId  | string  | Filter by subject                       |
+| type       | string  | Filter by type (mcq/theory)             |
+| difficulty | string  | Filter by difficulty (easy/medium/hard) |
+| topic      | string  | Filter by topic                         |
+| isArchived | boolean | Filter by archived status               |
 
 ---
 
@@ -926,7 +1247,7 @@ PATCH /questions/:id/archive
 
 ---
 
-## 11. ASSESSMENT ENDPOINTS
+## 12. ASSESSMENT ENDPOINTS
 
 ### Create Assessment
 
@@ -1035,7 +1356,7 @@ GET /assessments/:id
 
 ---
 
-### Update Assessment (Draft only)
+### Update Assessment (Draft Only)
 
 ```http
 PUT /assessments/:id
@@ -1085,7 +1406,7 @@ POST /assessments/:id/duplicate
 
 ---
 
-## 12. SUBMISSION ENDPOINTS
+## 13. SUBMISSION ENDPOINTS
 
 ### Start Assessment
 
@@ -1137,7 +1458,7 @@ GET /submissions/my?page=1&limit=10
 
 ---
 
-### Get All Submissions (Admin/Teacher)
+### Get All Submissions
 
 ```http
 GET /submissions?page=1&limit=10&assessmentId=...&studentId=...&status=submitted
@@ -1223,7 +1544,7 @@ PATCH /submissions/:id/grade
 
 ---
 
-## 13. RESULT ENDPOINTS
+## 14. RESULT ENDPOINTS
 
 ### Create Result from Submission
 
@@ -1315,7 +1636,7 @@ PATCH /results/:id/publish
 
 ---
 
-## 14. REPORT CARD ENDPOINTS
+## 15. REPORT CARD ENDPOINTS
 
 ### Generate Report Card
 
@@ -1387,96 +1708,210 @@ DELETE /results/report-cards/:id
 
 ---
 
-## 15. ANALYTICS ENDPOINTS
+## 16. DASHBOARD ENDPOINTS
 
-### Get My Analytics (Student)
+### Admin Dashboard
 
 ```http
-GET /analytics/my
+GET /dashboard/admin
+```
+
+**Roles:** `school_admin`
+
+**Response:** (Aggregated admin data)
+
+```json
+{
+  "stats": {
+    "totalStudents": 150,
+    "totalTeachers": 20,
+    "totalParents": 45,
+    "totalClasses": 10,
+    "totalSubjects": 15,
+    "totalAssessments": 45,
+    "pendingSubmissions": 12,
+    "unreadNotifications": 8,
+    "averageScore": 72.5,
+    "passRate": 85.0
+  },
+  "gradeDistribution": {
+    "A": 30,
+    "B": 40,
+    "C": 25,
+    "D": 10,
+    "E": 5,
+    "F": 40
+  },
+  "recentResults": [...],
+  "upcomingAssessments": [...]
+}
+```
+
+---
+
+### Teacher Dashboard
+
+```http
+GET /dashboard/teacher
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Student Dashboard
+
+```http
+GET /dashboard/student
+```
+
+**Roles:** `school_admin`, `teacher`, `student`
+
+---
+
+### Parent Dashboard
+
+```http
+GET /dashboard/parent
+```
+
+**Roles:** `school_admin`, `teacher`, `parent`
+
+---
+
+## 17. ATTENDANCE ENDPOINTS
+
+### Mark Attendance
+
+```http
+POST /attendance/mark
+```
+
+**Roles:** `school_admin`, `teacher`
+
+**Request Body:**
+
+```json
+{
+  "studentId": "...",
+  "classId": "...",
+  "status": "present",
+  "remark": "On time"
+}
+```
+
+---
+
+### Get My Attendance
+
+```http
+GET /attendance/my?startDate=2024-01-01&endDate=2024-01-31
 ```
 
 **Roles:** `student`
 
 ---
 
-### Get Dashboard Analytics
+### Get My Attendance Summary
 
 ```http
-GET /analytics/dashboard
+GET /attendance/my/summary?days=30
+```
+
+**Roles:** `student`
+
+---
+
+### Get Today's Attendance
+
+```http
+GET /attendance/today
 ```
 
 **Roles:** `school_admin`, `teacher`
 
-**Response:**
+---
+
+### Get Attendance by Date
+
+```http
+GET /attendance/date?date=2024-01-15
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Class Attendance
+
+```http
+GET /attendance/class/:classId?date=2024-01-15
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Class Attendance Summary
+
+```http
+GET /attendance/class/:classId/summary?days=30
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Student Attendance
+
+```http
+GET /attendance/student/:studentId?startDate=2024-01-01&endDate=2024-01-31
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Student Attendance Summary
+
+```http
+GET /attendance/student/:studentId/summary?days=30
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Attendance Stats
+
+```http
+GET /attendance/stats?startDate=2024-01-01&endDate=2024-01-31&classId=...
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Update Attendance
+
+```http
+PUT /attendance/:id
+```
+
+**Roles:** `school_admin`, `teacher`
+
+**Request Body:**
 
 ```json
 {
-  "overview": {
-    "totalStudents": 150,
-    "totalTeachers": 20,
-    "totalClasses": 10,
-    "totalSubjects": 15,
-    "totalAssessments": 45
-  },
-  "performance": {
-    "averageScore": 72.5,
-    "passRate": 85.0,
-    "gradeDistribution": {
-      "A": 30,
-      "B": 40,
-      "C": 25,
-      "D": 10,
-      "E": 5,
-      "F": 40
-    }
-  },
-  "recentActivity": [...]
+  "status": "present",
+  "remark": "Updated remark"
 }
 ```
 
 ---
 
-### Get Student Analytics
-
-```http
-GET /analytics/student/:studentId
-```
-
-**Roles:** `school_admin`, `teacher`
-
----
-
-### Get Class Analytics
-
-```http
-GET /analytics/class/:classId
-```
-
-**Roles:** `school_admin`, `teacher`
-
----
-
-### Get Subject Analytics
-
-```http
-GET /analytics/subject/:subjectId
-```
-
-**Roles:** `school_admin`, `teacher`
-
----
-
-### Get Assessment Analytics
-
-```http
-GET /analytics/assessment/:assessmentId
-```
-
-**Roles:** `school_admin`, `teacher`
-
----
-
-## 16. NOTIFICATION ENDPOINTS
+## 18. NOTIFICATION ENDPOINTS
 
 ### Get My Notifications
 
@@ -1548,7 +1983,7 @@ DELETE /notifications
 
 ---
 
-### Create Notification (Admin/Teacher)
+### Create Notification
 
 ```http
 POST /notifications
@@ -1620,59 +2055,266 @@ POST /notifications/send/announcement
 
 ---
 
-## 17. AUDIT LOG ENDPOINTS
+## 19. MESSAGE ENDPOINTS
 
-### Get All Audit Logs
+### Get Conversations
 
 ```http
-GET /audit?page=1&limit=10&userId=...&entity=User&action=user_login&entityId=...
+GET /messages/conversations?page=1&limit=20
+```
+
+**Roles:** `All`
+
+---
+
+### Get Unread Count
+
+```http
+GET /messages/unread/count
+```
+
+**Roles:** `All`
+
+---
+
+### Send Message
+
+```http
+POST /messages
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "receiverId": "...",
+  "content": "Hello! How are you?",
+  "subject": "Greetings"
+}
+```
+
+---
+
+### Get Messages with User
+
+```http
+GET /messages/:userId?page=1&limit=20
+```
+
+**Roles:** `All`
+
+---
+
+### Get Message by ID
+
+```http
+GET /messages/message/:id
+```
+
+**Roles:** `All`
+
+---
+
+### Mark Message as Read
+
+```http
+PATCH /messages/:id/read
+```
+
+**Roles:** `All`
+
+---
+
+### Mark All Messages as Read
+
+```http
+PATCH /messages/read-all/:senderId
+```
+
+**Roles:** `All`
+
+---
+
+### Delete Message
+
+```http
+DELETE /messages/:id
+```
+
+**Roles:** `All`
+
+---
+
+### Send Class Announcement
+
+```http
+POST /messages/class-announcement
+```
+
+**Roles:** `school_admin`, `teacher`
+
+**Request Body:**
+
+```json
+{
+  "classId": "...",
+  "title": "Important Announcement",
+  "content": "Please submit your assignments by Friday."
+}
+```
+
+---
+
+## 20. CALENDAR ENDPOINTS
+
+### Get Role-Based Calendar
+
+```http
+GET /calendar?month=1&year=2024
+```
+
+**Roles:** `All`
+
+---
+
+### Get Student Calendar
+
+```http
+GET /calendar/student?month=1&year=2024&studentId=...
+```
+
+**Roles:** `school_admin`, `teacher`, `student`
+
+---
+
+### Get Teacher Calendar
+
+```http
+GET /calendar/teacher?month=1&year=2024&teacherId=...
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Admin Calendar
+
+```http
+GET /calendar/admin?month=1&year=2024
 ```
 
 **Roles:** `school_admin`
 
 ---
 
-### Get Audit Logs by User
+## 21. ANALYTICS ENDPOINTS### Get My Analytics (Student)
 
 ```http
-GET /audit/user/:userId?page=1&limit=10
+GET /analytics/my
 ```
 
-**Roles:** `school_admin`
+**Roles:** `student`
 
 ---
 
-### Get Audit Logs by Entity
+### Get Dashboard Analytics
 
 ```http
-GET /audit/entity/:entity/:entityId?page=1&limit=10
+GET /analytics/dashboard
 ```
 
-**Roles:** `school_admin`
+**Roles:** `school_admin`, `teacher`
+
+**Response:**
+
+```json
+{
+  "overview": {
+    "totalStudents": 150,
+    "totalTeachers": 20,
+    "totalClasses": 10,
+    "totalSubjects": 15,
+    "totalAssessments": 45
+  },
+  "performance": {
+    "averageScore": 72.5,
+    "passRate": 85.0,
+    "gradeDistribution": {
+      "A": 30,
+      "B": 40,
+      "C": 25,
+      "D": 10,
+      "E": 5,
+      "F": 40
+    }
+  },
+  "recentActivity": [...]
+}
+```
 
 ---
 
-### Get Audit Logs by Action
+### Get Student Analytics
 
 ```http
-GET /audit/action/:action?page=1&limit=10
+GET /analytics/student/:studentId
 ```
 
-**Roles:** `school_admin`
+**Roles:** `school_admin`, `teacher`
+
+**Response:**
+
+```json
+{
+  "studentId": "...",
+  "overallStats": {
+    "totalAssessments": 10,
+    "totalMarks": 500,
+    "obtainedMarks": 400,
+    "overallPercentage": 80,
+    "grade": "A"
+  },
+  "subjectPerformance": [...],
+  "gradeDistribution": { "A": 4, "B": 3, "C": 2, "D": 1 },
+  "trend": [...]
+}
+```
 
 ---
 
-### Get Audit Log by ID
+### Get Class Analytics
 
 ```http
-GET /audit/:id
+GET /analytics/class/:classId
 ```
 
-**Roles:** `school_admin`
+**Roles:** `school_admin`, `teacher`
 
 ---
 
-## 18. AI ENDPOINTS
+### Get Subject Analytics
+
+```http
+GET /analytics/subject/:subjectId
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Assessment Analytics
+
+```http
+GET /analytics/assessment/:assessmentId
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+## 22. AI ENDPOINTS
 
 ### Generate with AI
 
@@ -1836,7 +2478,7 @@ GET /ai/:id
 
 ---
 
-## 19. BILLING ENDPOINTS
+## 23. BILLING ENDPOINTS
 
 ### Get Subscription
 
@@ -1925,6 +2567,424 @@ GET /billing/usage
 
 ---
 
+## 24. NOTIFICATION SETTINGS
+
+### Get Notification Settings
+
+```http
+GET /notification-settings
+```
+
+**Roles:** `All`
+
+**Response:**
+
+```json
+{
+  "email": {
+    "enabled": true,
+    "assessmentReminders": true,
+    "resultPublished": true,
+    "classAnnouncements": true,
+    "messages": true,
+    "systemUpdates": true
+  },
+  "push": { ... },
+  "sms": { ... },
+  "inApp": { ... },
+  "quietHours": {
+    "enabled": false,
+    "start": "22:00",
+    "end": "07:00"
+  }
+}
+```
+
+---
+
+### Update Email Settings
+
+```http
+PUT /notification-settings/email
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "enabled": true,
+  "assessmentReminders": true,
+  "resultPublished": true,
+  "classAnnouncements": false,
+  "messages": true,
+  "systemUpdates": false
+}
+```
+
+---
+
+### Update Push Settings
+
+```http
+PUT /notification-settings/push
+```
+
+**Roles:** `All`
+
+---
+
+### Update SMS Settings
+
+```http
+PUT /notification-settings/sms
+```
+
+**Roles:** `All`
+
+---
+
+### Update In-App Settings
+
+```http
+PUT /notification-settings/in-app
+```
+
+**Roles:** `All`
+
+---
+
+### Update Quiet Hours
+
+```http
+PUT /notification-settings/quiet-hours
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "enabled": true,
+  "start": "22:00",
+  "end": "07:00"
+}
+```
+
+---
+
+### Toggle Channel
+
+```http
+PATCH /notification-settings/toggle-channel
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "channel": "email",
+  "enabled": true
+}
+```
+
+---
+
+### Toggle All Channels
+
+```http
+PATCH /notification-settings/toggle-all
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "enabled": true
+}
+```
+
+---
+
+## 25. SUPPORT / HELP DESK ENDPOINTS
+
+### Create Support Ticket
+
+```http
+POST /support/tickets
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "subject": "Cannot access assessment",
+  "message": "I keep getting an error when trying to start my math assessment",
+  "category": "technical",
+  "priority": "high"
+}
+```
+
+**Categories:** `technical` | `academic` | `billing` | `general` | `feature_request` | `bug_report`
+
+---
+
+### Get My Tickets
+
+```http
+GET /support/tickets/my?page=1&limit=10
+```
+
+**Roles:** `All`
+
+---
+
+### Get All Tickets (Admin)
+
+```http
+GET /support/tickets?page=1&limit=10&status=open&category=technical
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Get Ticket by ID
+
+```http
+GET /support/tickets/:id
+```
+
+**Roles:** `All`
+
+---
+
+### Update Ticket
+
+```http
+PUT /support/tickets/:id
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Add Response to Ticket
+
+```http
+POST /support/tickets/:id/response
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "message": "Thank you for your response. I will try that solution."
+}
+```
+
+---
+
+### Resolve Ticket
+
+```http
+PATCH /support/tickets/:id/resolve
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Close Ticket
+
+```http
+PATCH /support/tickets/:id/close
+```
+
+**Roles:** `school_admin`, `teacher`
+
+---
+
+### Assign Ticket
+
+```http
+PATCH /support/tickets/:id/assign
+```
+
+**Roles:** `school_admin`, `teacher`
+
+**Request Body:**
+
+```json
+{
+  "assignedTo": "..."
+}
+```
+
+---
+
+### Rate Ticket
+
+```http
+PATCH /support/tickets/:id/rate
+```
+
+**Roles:** `All`
+
+**Request Body:**
+
+```json
+{
+  "rating": 5,
+  "feedback": "Great support!"
+}
+```
+
+---
+
+### Get All FAQs
+
+```http
+GET /support/faqs?category=technical&page=1&limit=20
+```
+
+**Roles:** `All`
+
+---
+
+### Get FAQ by ID
+
+```http
+GET /support/faqs/:id
+```
+
+**Roles:** `All`
+
+---
+
+### Mark FAQ as Helpful
+
+```http
+PATCH /support/faqs/:id/helpful
+```
+
+**Roles:** `All`
+
+---
+
+### Mark FAQ as Not Helpful
+
+```http
+PATCH /support/faqs/:id/not-helpful
+```
+
+**Roles:** `All`
+
+---
+
+### Create FAQ (Admin)
+
+```http
+POST /support/faqs
+```
+
+**Roles:** `school_admin`
+
+**Request Body:**
+
+```json
+{
+  "question": "How do I reset my password?",
+  "answer": "Go to the login page and click 'Forgot Password'.",
+  "category": "account",
+  "order": 1
+}
+```
+
+---
+
+### Update FAQ (Admin)
+
+```http
+PUT /support/faqs/:id
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Delete FAQ (Admin)
+
+```http
+DELETE /support/faqs/:id
+```
+
+**Roles:** `school_admin`
+
+---
+
+## 26. AUDIT LOG ENDPOINTS
+
+### Get All Audit Logs
+
+```http
+GET /audit?page=1&limit=10&userId=...&entity=User&action=user_login&entityId=...
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Get Audit Logs by User
+
+```http
+GET /audit/user/:userId?page=1&limit=10
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Get Audit Logs by Entity
+
+```http
+GET /audit/entity/:entity/:entityId?page=1&limit=10
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Get Audit Logs by Action
+
+```http
+GET /audit/action/:action?page=1&limit=10
+```
+
+**Roles:** `school_admin`
+
+---
+
+### Get Audit Log by ID
+
+```http
+GET /audit/:id
+```
+
+**Roles:** `school_admin`
+
+---
+
 ## Response Format
 
 All endpoints return a standardized response:
@@ -1988,25 +3048,30 @@ All endpoints return a standardized response:
 
 ---
 
-## Authentication Flow
+## Role-Based Access Summary
 
-1. **Register** user via `/auth/register`
-2. **Login** via `/auth/login` to get `accessToken` and `refreshToken`
-3. **Include** `accessToken` in `Authorization: Bearer <token>` header for protected endpoints
-4. **Refresh** token via `/auth/refresh-token` when `accessToken` expires
-5. **Logout** by discarding tokens on client side
+| Role           | Permissions                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| `school_admin` | Full access to all admin features, manage users, schools, billing       |
+| `teacher`      | Create/manage questions, assessments, grade submissions, view analytics |
+| `student`      | View assessments, take CBT, view results, track progress                |
+| `parent`       | View children's progress, results, attendance, receive notifications    |
 
 ---
 
 ## Frontend Integration Tips
 
-1. **Store tokens** securely (HTTP-only cookies or localStorage)
-2. **Handle token expiry** - refresh token automatically before expiry
-3. **Use interceptors** to add Authorization header to all requests
-4. **Handle errors** - show user-friendly error messages
-5. **Use pagination** for all list endpoints
-6. **Poll for updates** on assessment/submission status
+1. **Store tokens securely** - Use HTTP-only cookies or localStorage with proper security
+2. **Handle token expiry** - Refresh token automatically before expiry
+3. **Use interceptors** - Add Authorization header to all requests
+4. **Handle errors** - Show user-friendly error messages
+5. **Use pagination** - For all list endpoints
+6. **Poll for updates** - On assessment/submission status
 
 ---
 
 **Happy Building! 🚀**
+
+---
+
+_Documentation Version: 2.0 | Last Updated: July 2026_

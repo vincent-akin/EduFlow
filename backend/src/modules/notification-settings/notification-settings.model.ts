@@ -52,7 +52,7 @@ const NotificationSettingsSchema = new Schema<INotificationSettings>(
       ref: 'User',
       required: true,
       unique: true,
-      index: true,
+      
     },
     schoolId: {
       type: Schema.Types.ObjectId,
