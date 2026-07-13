@@ -21,6 +21,14 @@ import notificationRoutes from './modules/notifications/notification.routes.js';
 import auditRoutes from './modules/audit/audit.routes.js';
 import aiRoutes from './modules/ai/ai.routes.js';
 import billingRoutes from './modules/billing/billing.routes.js';
+import parentRoutes from './modules/parents/parent.routes.js';
+import attendanceRoutes from './modules/attendance/attendance.routes.js';
+import fileRoutes from './modules/files/file.routes.js';
+import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
+import roleRoutes from './modules/roles/role.routes.js';
+import importExportRoutes from './modules/import-export/import-export.routes.js';
+
+
 
 const app = express();
 
@@ -69,6 +77,13 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/billing', billingRoutes);
 app.use('/api/v1/ai', aiRoutes);
+// Add these routes
+app.use('/api/v1/parents', parentRoutes);
+app.use('/api/v1/attendance', attendanceRoutes);
+app.use('/api/v1/files', fileRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/roles', roleRoutes);
+app.use('/api/v1/import-export', importExportRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {

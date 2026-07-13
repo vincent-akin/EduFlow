@@ -16,7 +16,7 @@ export interface SoftDeleteDocument extends TenantDocument {
 }
 
 // ============ User Types ============
-export type UserRole = 'school_admin' | 'teacher' | 'student';
+export type UserRole = 'school_admin' | 'teacher' | 'student' | 'parent';
 
 // ============ Question Types ============
 export type QuestionType = 'mcq' | 'theory';
