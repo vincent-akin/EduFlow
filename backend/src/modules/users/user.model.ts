@@ -15,7 +15,7 @@ const UserSchema = new Schema<IUser>(
             required: true,
             trim: true,
         },
-        fullName: {
+            fullName: {
             type: String,
             required: true,
             trim: true,
@@ -33,7 +33,7 @@ const UserSchema = new Schema<IUser>(
         },
         role: {
             type: String,
-            enum: ['school_admin', 'teacher', 'student'],
+            enum: ['school_admin', 'teacher', 'student', 'parent'],
             required: true,
         },
         avatar: {
@@ -53,6 +53,15 @@ const UserSchema = new Schema<IUser>(
             default: true,
         },
         lastLoginAt: {
+            type: Date,
+            default: null,
+        },
+        // ✅ Add these for password reset functionality
+        resetPasswordToken: {
+            type: String,
+            default: null,
+        },
+        resetPasswordExpires: {
             type: Date,
             default: null,
         },

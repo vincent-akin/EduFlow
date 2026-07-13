@@ -40,12 +40,14 @@ export interface IUser extends SoftDeleteDocument {
     fullName: string;
     email: string;
     passwordHash: string;
-    role: 'school_admin' | 'teacher' | 'student';
+    role: 'school_admin' | 'teacher' | 'student' | 'parent';
     avatar: string | null;
     phone: string | null;
     emailVerified: boolean;
     isActive: boolean;
     lastLoginAt: Date | null;
+    resetPasswordToken: string | null;  // ✅ Add this
+    resetPasswordExpires: Date | null;  // ✅ Add this
 }
 
 export interface ITeacherProfile extends SoftDeleteDocument {
