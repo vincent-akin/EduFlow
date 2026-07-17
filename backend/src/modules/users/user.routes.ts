@@ -1,4 +1,13 @@
 import { Router } from 'express';
+import {
+  getAllUsersController,
+  getUserByIdController,
+  updateUserController,
+  deleteUserController,
+  getTeachersController,
+  getStudentsController,
+  getParentsController,
+} from './user.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { rbacMiddleware } from '../../middlewares/rbac.middleware.js';
 import { tenantMiddleware } from '../../middlewares/tenant.middleware.js';
@@ -8,36 +17,27 @@ const router = Router();
 // All routes require authentication and tenant
 router.use(authMiddleware, tenantMiddleware);
 
-// User management routes (admin only)
-router.get('/', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Get all users' });
-});
+// ============ Admin Routes ============
+// Get all users (with pagination and filters)
+router.get('/', rbacMiddleware(['school_admin']), getAllUsersController);
 
-router.get('/:id', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Get user by ID' });
-});
+// Get user by ID
+router.get('/:id', rbacMiddleware(['school_admin']), getUserByIdController);
 
-router.put('/:id', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Update user' });
-});
+// Update user
+router.put('/:id', rbacMiddleware(['school_admin']), updateUserController);
 
-router.delete('/:id', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Delete user' });
-});
+// Delete user (soft delete)
+router.delete('/:id', rbacMiddleware(['school_admin']), deleteUserController);
 
-// Teacher routes
-router.get('/teachers', rbacMiddleware(['school_admin', 'teacher']), (_req, res) => {
-  res.json({ message: 'Get all teachers' });
-});
+// ============ Teacher/Admin Routes ============
+// Get all teachers
+router.get('/teachers', rbacMiddleware(['school_admin', 'teacher']), getTeachersController);
 
-// Student routes
-router.get('/students', rbacMiddleware(['school_admin', 'teacher']), (_req, res) => {
-  res.json({ message: 'Get all students' });
-});
+// Get all students
+router.get('/students', rbacMiddleware(['school_admin', 'teacher']), getStudentsController);
 
-// Billing status route
-router.get('/billing/status', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Billing status' });
-});
+// Get all parents
+router.get('/parents', rbacMiddleware(['school_admin', 'teacher']), getParentsController);
 
 export default router;

@@ -347,6 +347,106 @@ export const getAssessmentAnalytics = async (
   };
 };
 
+// ============ Performance Trend ============
+export const getPerformanceTrend = async (
+  schoolId: Types.ObjectId,
+  months: number = 12
+): Promise<{ month: string; score: number }[]> => {
+  // Get all published results for the school
+  const results = await Result.find({
+    schoolId,
+    status: 'published',
+  });
+
+  if (results.length === 0) {
+    // Return empty array if no results
+    return [];
+  }
+
+  // Group results by month
+  const monthMap = new Map<string, { total: number; count: number }>();
+  
+  results.forEach((result) => {
+    const date = result.createdAt || result.publishedAt || new Date();
+    const monthKey = date.toISOString().slice(0, 7); // YYYY-MM
+    
+    if (!monthMap.has(monthKey)) {
+      monthMap.set(monthKey, { total: 0, count: 0 });
+    }
+    const entry = monthMap.get(monthKey)!;
+    entry.total += result.percentage;
+    entry.count += 1;
+  });
+
+  // Convert to array and sort by month
+  const trend = Array.from(monthMap.entries())
+    .map(([month, data]) => ({
+      month,
+      score: Math.round((data.total / data.count) * 100) / 100,
+    }))
+    .sort((a, b) => a.month.localeCompare(b.month));
+
+  // If we have fewer than `months` months of data, pad with previous months
+  if (trend.length < months && trend.length > 0) {
+    const avgScore = trend.reduce((sum, d) => sum + d.score, 0) / trend.length;
+    
+    const paddedTrend = [];
+    const now = new Date();
+    for (let i = months - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setMonth(date.getMonth() - i);
+      const monthKey = date.toISOString().slice(0, 7);
+      const existing = trend.find(d => d.month === monthKey);
+      paddedTrend.push({
+        month: monthKey,
+        score: existing ? existing.score : Math.round(avgScore * 100) / 100,
+      });
+    }
+    return paddedTrend;
+  }
+
+  return trend;
+};
+
+// ============ Assessment Types Distribution ============
+export const getAssessmentTypeDistribution = async (
+  schoolId: Types.ObjectId
+): Promise<{ name: string; value: number; color: string }[]> => {
+  // Get all published assessments
+  const assessments = await Assessment.find({
+    schoolId,
+    status: 'published',
+    deletedAt: null,
+  });
+
+  if (assessments.length === 0) {
+    return [];
+  }
+
+  // Group by type
+  const typeMap = new Map<string, number>();
+  assessments.forEach((assessment) => {
+    const type = assessment.type || 'unknown';
+    typeMap.set(type, (typeMap.get(type) || 0) + 1);
+  });
+
+  // Color mapping
+  const colorMap: Record<string, string> = {
+    quiz: '#8B5CF6',
+    test: '#3B82F6',
+    assignment: '#10B981',
+    exam: '#F59E0B',
+    unknown: '#6B7280',
+  };
+
+  // Convert to array
+  return Array.from(typeMap.entries()).map(([name, value]) => ({
+    name: name.charAt(0).toUpperCase() + name.slice(1),
+    value,
+    color: colorMap[name] || '#6B7280',
+  }));
+};
+
 // ============ Dashboard Analytics ============
 export const getDashboardAnalytics = async (
   schoolId: Types.ObjectId
@@ -405,6 +505,7 @@ export const getDashboardAnalytics = async (
     })),
   };
 };
+
 
 // ============ Helper Functions ============
 const calculateGrade = (percentage: number): string => {

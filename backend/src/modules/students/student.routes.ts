@@ -1,4 +1,13 @@
 import { Router } from 'express';
+import {
+  getAllStudentsController,
+  getStudentByIdController,
+  getMyStudentProfileController,
+  getStudentsByClassController,
+  createStudentController,
+  updateStudentController,
+  deleteStudentController,
+} from './student.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { rbacMiddleware } from '../../middlewares/rbac.middleware.js';
 import { tenantMiddleware } from '../../middlewares/tenant.middleware.js';
@@ -8,31 +17,18 @@ const router = Router();
 // All routes require authentication and tenant
 router.use(authMiddleware, tenantMiddleware);
 
-// Student routes (accessible by students, teachers, and admins)
-router.get('/me', (_req, res) => {
-  // Get current student profile
-  res.json({ message: 'Get my student profile' });
-});
+// ============ Student Routes ============
+// Get my student profile
+router.get('/me', getMyStudentProfileController);
 
-// Admin/Teacher routes
-router.get('/', rbacMiddleware(['school_admin', 'teacher']), (_req, res) => {
-  res.json({ message: 'Get all students' });
-});
+// ============ Admin/Teacher Routes ============
+router.get('/', rbacMiddleware(['school_admin', 'teacher']), getAllStudentsController);
+router.get('/class/:classId', rbacMiddleware(['school_admin', 'teacher']), getStudentsByClassController);
+router.get('/:id', rbacMiddleware(['school_admin', 'teacher']), getStudentByIdController);
 
-router.get('/:id', rbacMiddleware(['school_admin', 'teacher']), (_req, res) => {
-  res.json({ message: 'Get student by ID' });
-});
-
-router.post('/', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Create student' });
-});
-
-router.put('/:id', rbacMiddleware(['school_admin', 'teacher']), (_req, res) => {
-  res.json({ message: 'Update student' });
-});
-
-router.delete('/:id', rbacMiddleware(['school_admin']), (_req, res) => {
-  res.json({ message: 'Delete student' });
-});
+// ============ Admin Routes ============
+router.post('/', rbacMiddleware(['school_admin']), createStudentController);
+router.put('/:id', rbacMiddleware(['school_admin', 'teacher']), updateStudentController);
+router.delete('/:id', rbacMiddleware(['school_admin']), deleteStudentController);
 
 export default router;

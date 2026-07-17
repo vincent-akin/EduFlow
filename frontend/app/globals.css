@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui,
+      sans-serif;
+
+    /* Light theme — "Violet" (mockup: light purple dashboard) */
+    --background: 0 0% 100%;
+    --foreground: 260 25% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 260 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 25% 12%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 60% 97%;
+    --secondary-foreground: 260 25% 20%;
+
+    --muted: 260 30% 96%;
+    --muted-foreground: 260 10% 45%;
+
+    --accent: 262 83% 96%;
+    --accent-foreground: 262 83% 40%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 260 25% 12%;
+
+    --gold: 38 92% 50%;
+    --gold-foreground: 260 25% 12%;
+
+    --border: 260 30% 91%;
+    --input: 260 30% 91%;
+    --ring: 262 83% 58%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 260 15% 35%;
+    --sidebar-active: 262 83% 58%;
+    --sidebar-active-foreground: 0 0% 100%;
+
+    --chart-1: 262 83% 58%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 330 81% 60%;
+    --chart-4: 38 92% 50%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark theme — "Emerald" (mockup: dark green/teal dashboard) */
+    --background: 165 45% 7%;
+    --foreground: 150 20% 92%;
+
+    --card: 165 38% 10%;
+    --card-foreground: 150 20% 92%;
+
+    --popover: 165 38% 10%;
+    --popover-foreground: 150 20% 92%;
+
+    --primary: 158 64% 45%;
+    --primary-foreground: 165 45% 7%;
+
+    --secondary: 165 30% 13%;
+    --secondary-foreground: 150 20% 88%;
+
+    --muted: 165 25% 14%;
+    --muted-foreground: 160 15% 62%;
+
+    --accent: 158 50% 18%;
+    --accent-foreground: 150 20% 92%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 158 64% 45%;
+    --success-foreground: 165 45% 7%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 165 45% 7%;
+
+    --gold: 38 92% 55%;
+    --gold-foreground: 165 45% 7%;
+
+    --border: 165 30% 17%;
+    --input: 165 30% 17%;
+    --ring: 158 64% 45%;
+
+    --sidebar-background: 165 42% 6%;
+    --sidebar-foreground: 150 15% 70%;
+    --sidebar-active: 158 64% 45%;
+    --sidebar-active-foreground: 165 45% 7%;
+
+    --chart-1: 158 64% 45%;
+    --chart-2: 199 89% 55%;
+    --chart-3: 330 81% 60%;
+    --chart-4: 38 92% 55%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-image: radial-gradient(
+      hsl(var(--foreground) / 0.06) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
+}

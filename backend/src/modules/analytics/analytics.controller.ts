@@ -5,6 +5,8 @@ import {
   getSubjectAnalytics,
   getAssessmentAnalytics,
   getDashboardAnalytics,
+  getPerformanceTrend,
+  getAssessmentTypeDistribution,
 } from './analytics.service.js';
 import { ResponseHelper } from '../../shared/helpers/response.helper.js';
 import { Types } from 'mongoose';
@@ -54,6 +56,27 @@ export const getAssessmentAnalyticsController = async (req: Request, res: Respon
   const schoolId = (req as any).schoolId;
   const analytics = await getAssessmentAnalytics(new Types.ObjectId(assessmentId), schoolId);
   return ResponseHelper.success(res, analytics, 'Assessment analytics retrieved successfully');
+};
+
+export const getPerformanceTrendController = async (req: Request, res: Response): Promise<Response> => {
+  const schoolId = (req as any).schoolId;
+  const months = req.query.months ? parseInt(req.query.months as string) : 12;
+  
+  const trend = await getPerformanceTrend(schoolId, months);
+  return ResponseHelper.success(res, trend, 'Performance trend retrieved successfully');
+};
+
+export const getAssessmentTypeDistributionController = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const schoolId = (req as any).schoolId;
+  const distribution = await getAssessmentTypeDistribution(schoolId);
+  return ResponseHelper.success(
+    res,
+    distribution,
+    'Assessment type distribution retrieved successfully'
+  );
 };
 
 export const getDashboardAnalyticsController = async (req: Request, res: Response): Promise<Response> => {

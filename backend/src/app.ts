@@ -31,7 +31,7 @@ import calendarRoutes from './modules/calendar/calendar.routes.js';
 import messageRoutes from './modules/messages/message.routes.js';
 import notificationSettingsRoutes from './modules/notification-settings/notification-settings.routes.js';
 import supportRoutes from './modules/support/support.routes.js';
-
+import userRoutes from './modules/users/user.routes.js';
 
 
 const app = express();
@@ -91,6 +91,7 @@ app.use('/api/v1/calendar', calendarRoutes);
 app.use('/api/v1/messages', messageRoutes);
 app.use('/api/v1/notification-settings', notificationSettingsRoutes);
 app.use('/api/v1/support', supportRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // ============ 404 Handler ============
 app.use((req, res) => {

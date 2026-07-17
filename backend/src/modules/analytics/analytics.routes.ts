@@ -6,6 +6,8 @@ import {
   getSubjectAnalyticsController,
   getAssessmentAnalyticsController,
   getDashboardAnalyticsController,
+  getPerformanceTrendController,
+  getAssessmentTypeDistributionController,
 } from './analytics.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { rbacMiddleware } from '../../middlewares/rbac.middleware.js';
@@ -24,6 +26,12 @@ router.get(
   '/dashboard',
   rbacMiddleware(['school_admin', 'teacher']),
   getDashboardAnalyticsController
+);
+
+router.get(
+  '/performance-trend',
+  rbacMiddleware(['school_admin', 'teacher']),
+  getPerformanceTrendController
 );
 
 router.get(
@@ -48,6 +56,12 @@ router.get(
   '/assessment/:assessmentId',
   rbacMiddleware(['school_admin', 'teacher']),
   getAssessmentAnalyticsController
+);
+
+router.get(
+  '/assessment-types',
+  rbacMiddleware(['school_admin', 'teacher']),
+  getAssessmentTypeDistributionController
 );
 
 export default router;

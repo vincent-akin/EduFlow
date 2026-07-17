@@ -415,7 +415,7 @@ export interface JwtPayload {
     id: string;
     schoolId: string;
     email: string;
-    role: 'school_admin' | 'teacher' | 'student';
+    role: 'school_admin' | 'teacher' | 'student' | 'parent';
     iat?: number;
     exp?: number;
 }
