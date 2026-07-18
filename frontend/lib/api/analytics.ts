@@ -66,3 +66,29 @@ export async function getAssessmentTypeDistribution(): Promise<AssessmentTypeDis
     };
   });
 }
+
+export interface RecentActivity {
+  id: string;
+  studentName: string;
+  assessmentTitle: string;
+  subjectName: string;
+  score: number;
+  totalMarks: number;
+  percentage: number;
+  grade: string;
+  createdAt: string;
+}
+
+export async function getRecentActivities(limit: number = 10): Promise<RecentActivity[]> {
+  return authedRequest<RecentActivity[]>(`/analytics/recent-activities?limit=${limit}`);
+}
+
+export interface TopPerformingClass {
+  rank: number;
+  name: string;
+  score: number;
+}
+
+export async function getTopPerformingClasses(limit: number = 5): Promise<TopPerformingClass[]> {
+  return authedRequest<TopPerformingClass[]>(`/analytics/top-classes?limit=${limit}`);
+}

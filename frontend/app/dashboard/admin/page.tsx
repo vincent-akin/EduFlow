@@ -19,32 +19,19 @@ import { Button } from "@/components/ui/button";
 import { CreateAssessmentDialog } from "@/components/dashboard/create-assessment-dialog";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useAdminDashboard } from "@/lib/api/use-dashboard";
-import { usePerformanceTrend, useAssessmentTypeDistribution } from "@/lib/api/use-analytics";
+import { 
+  usePerformanceTrend, 
+  useAssessmentTypeDistribution,
+  useRecentActivities,
+  useTopPerformingClasses
+} from "@/lib/api/use-analytics";
 
-// Keep mock data for recent activities and top performing classes
-import {
-  recentActivities,
-  topPerformingClasses,
-} from "@/lib/mock/data";
-
-// Color mapping for assessment types with light backgrounds and deep foregrounds
+// Color mapping for assessment types
 const assessmentTypeColors: Record<string, { color: string; bgColor: string }> = {
-  'Quiz': { 
-    color: '#7C3AED', // Deep purple
-    bgColor: '#EDE9FE' // Light purple
-  },
-  'Test': { 
-    color: '#2563EB', // Deep blue
-    bgColor: '#DBEAFE' // Light blue
-  },
-  'Assignment': { 
-    color: '#059669', // Deep green
-    bgColor: '#D1FAE5' // Light green
-  },
-  'Exam': { 
-    color: '#D97706', // Deep amber
-    bgColor: '#FEF3C7' // Light amber
-  },
+  'Quiz': { color: '#7C3AED', bgColor: '#EDE9FE' },
+  'Test': { color: '#2563EB', bgColor: '#DBEAFE' },
+  'Assignment': { color: '#059669', bgColor: '#D1FAE5' },
+  'Exam': { color: '#D97706', bgColor: '#FEF3C7' },
 };
 
 const defaultTypes = [
@@ -54,7 +41,7 @@ const defaultTypes = [
   { name: 'Exam', value: 0, color: '#D97706', bgColor: '#FEF3C7' },
 ];
 
-// Create Menu component (keep the same)
+// Create Menu component
 function CreateMenu({ onNewAssessment }: { onNewAssessment: () => void }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -113,12 +100,14 @@ export default function AdminDashboardPage() {
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useAdminDashboard();
   const { data: trendData, isLoading: trendLoading } = usePerformanceTrend(12);
   const { data: typeDistribution, isLoading: typeLoading } = useAssessmentTypeDistribution();
+  const { data: recentActivities, isLoading: activitiesLoading } = useRecentActivities(5);
+  const { data: topClasses, isLoading: topClassesLoading } = useTopPerformingClasses(5);
   
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [createdCount, setCreatedCount] = React.useState(0);
 
   // Loading state
-  if (dashboardLoading || trendLoading || typeLoading) {
+  if (dashboardLoading || trendLoading || typeLoading || activitiesLoading || topClassesLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -210,6 +199,16 @@ export default function AdminDashboardPage() {
 
   const totalAssessments = assessmentTypes.reduce((sum, d) => sum + d.value, 0);
 
+  // Use real recent activities
+  const activities = recentActivities && recentActivities.length > 0
+    ? recentActivities
+    : [];
+
+  // Use real top performing classes
+  const classes = topClasses && topClasses.length > 0
+    ? topClasses
+    : [];
+
   return (
     <div>
       <PageHeader
@@ -247,33 +246,49 @@ export default function AdminDashboardPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Panel title="Recent Activities">
-          <ul className="space-y-4">
-            {recentActivities.map((activity) => (
-              <li key={activity.id} className="flex gap-3 text-sm">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                <div>
-                  <p className="text-foreground">{activity.text}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {activity.time}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {activities.length > 0 ? (
+            <ul className="space-y-4">
+              {activities.map((activity: any) => (
+                <li key={activity.id} className="flex gap-3 text-sm">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <div>
+                    <p className="text-foreground">
+                      {activity.studentName} - {activity.assessmentTitle}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {activity.subjectName} • Score: {activity.percentage}% • Grade: {activity.grade}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <p className="text-sm text-muted-foreground">No recent activities</p>
+              <p className="text-xs text-muted-foreground mt-1">Activities will appear once students start taking assessments</p>
+            </div>
+          )}
         </Panel>
 
         <Panel title="Top Performing Classes" action={{ label: "View all", href: "/dashboard/analytics" }}>
-          <ul className="space-y-3">
-            {topPerformingClasses.map((cls) => (
-              <li key={cls.rank} className="flex items-center gap-3 text-sm">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-secondary-foreground">
-                  {cls.rank}
-                </span>
-                <span className="flex-1 text-foreground">{cls.name}</span>
-                <span className="font-semibold text-success">{cls.score}%</span>
-              </li>
-            ))}
-          </ul>
+          {classes.length > 0 ? (
+            <ul className="space-y-3">
+              {classes.map((cls: any) => (
+                <li key={cls.rank} className="flex items-center gap-3 text-sm">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-secondary-foreground">
+                    {cls.rank}
+                  </span>
+                  <span className="flex-1 text-foreground">{cls.name}</span>
+                  <span className="font-semibold text-success">{cls.score}%</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <p className="text-sm text-muted-foreground">No class data available</p>
+              <p className="text-xs text-muted-foreground mt-1">Class performance will appear once students have results</p>
+            </div>
+          )}
         </Panel>
       </div>
 

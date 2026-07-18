@@ -6,7 +6,9 @@ import {
   getAssessmentAnalytics,
   getDashboardAnalytics,
   getPerformanceTrend,
+  getRecentActivities,
   getAssessmentTypeDistribution,
+  getTopPerformingClasses, // ✅ Add this import
 } from './analytics.service.js';
 import { ResponseHelper } from '../../shared/helpers/response.helper.js';
 import { Types } from 'mongoose';
@@ -66,6 +68,13 @@ export const getPerformanceTrendController = async (req: Request, res: Response)
   return ResponseHelper.success(res, trend, 'Performance trend retrieved successfully');
 };
 
+export const getRecentActivitiesController = async (req: Request, res: Response): Promise<Response> => {
+  const schoolId = (req as any).schoolId;
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+  const activities = await getRecentActivities(schoolId, limit);
+  return ResponseHelper.success(res, activities, 'Recent activities retrieved successfully');
+};
+
 export const getAssessmentTypeDistributionController = async (
   req: Request,
   res: Response
@@ -76,6 +85,20 @@ export const getAssessmentTypeDistributionController = async (
     res,
     distribution,
     'Assessment type distribution retrieved successfully'
+  );
+};
+
+export const getTopPerformingClassesController = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const schoolId = (req as any).schoolId;
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+  const classes = await getTopPerformingClasses(schoolId, limit);
+  return ResponseHelper.success(
+    res,
+    classes,
+    'Top performing classes retrieved successfully'
   );
 };
 

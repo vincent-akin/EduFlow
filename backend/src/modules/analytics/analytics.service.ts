@@ -506,6 +506,124 @@ export const getDashboardAnalytics = async (
   };
 };
 
+// ============ Recent Activities ============
+export const getRecentActivities = async (
+  schoolId: Types.ObjectId,
+  limit: number = 10
+): Promise<{
+  id: string;
+  studentName: string;
+  assessmentTitle: string;
+  subjectName: string;
+  score: number;
+  totalMarks: number;
+  percentage: number;
+  grade: string;
+  createdAt: Date;
+}[]> => {
+  // Get recent results
+  const results = await Result.find({
+    schoolId,
+    status: 'published',
+  })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .populate('studentId', 'firstName lastName')
+    .populate('assessmentId', 'title')
+    .populate('subjectId', 'name');
+
+  return results.map((result: any) => ({
+    id: result._id.toString(),
+    studentName: result.studentId ? `${result.studentId.firstName} ${result.studentId.lastName}` : 'Unknown',
+    assessmentTitle: result.assessmentId?.title || 'Unknown',
+    subjectName: result.subjectId?.name || 'Unknown',
+    score: result.obtainedMarks,
+    totalMarks: result.totalMarks,
+    percentage: result.percentage,
+    grade: result.grade,
+    createdAt: result.createdAt,
+  }));
+};
+
+// ============ Top Performing Classes ============
+export const getTopPerformingClasses = async (
+  schoolId: Types.ObjectId,
+  limit: number = 5
+): Promise<{ rank: number; name: string; score: number }[]> => {
+  // Get all classes
+  const classes = await Class.find({
+    schoolId,
+    deletedAt: null,
+    isActive: true,
+  });
+
+  if (classes.length === 0) {
+    return [];
+  }
+
+  // Calculate average score per class
+  const classScores = await Promise.all(
+    classes.map(async (cls) => {
+      // Get all students in this class
+      const students = await StudentProfile.find({
+        schoolId,
+        classId: cls._id,
+        deletedAt: null,
+      });
+
+      if (students.length === 0) {
+        return {
+          classId: cls._id,
+          name: cls.name,
+          totalScore: 0,
+          count: 0,
+        };
+      }
+
+      const studentIds = students.map(s => s.userId);
+
+      // Get results for these students
+      const results = await Result.find({
+        schoolId,
+        studentId: { $in: studentIds },
+        status: 'published',
+      });
+
+      if (results.length === 0) {
+        return {
+          classId: cls._id,
+          name: cls.name,
+          totalScore: 0,
+          count: 0,
+        };
+      }
+
+      const totalPercentage = results.reduce((sum, r) => sum + r.percentage, 0);
+      const averageScore = totalPercentage / results.length;
+
+      return {
+        classId: cls._id,
+        name: cls.name,
+        totalScore: averageScore,
+        count: results.length,
+      };
+    })
+  );
+
+  // Filter out classes with no results, sort by score descending, and rank
+  const rankedClasses = classScores
+    .filter(c => c.count > 0)
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .slice(0, limit)
+    .map((cls, index) => ({
+      rank: index + 1,
+      name: cls.name,
+      score: Math.round(cls.totalScore * 10) / 10,
+    }));
+
+  return rankedClasses;
+};
+
 
 // ============ Helper Functions ============
 const calculateGrade = (percentage: number): string => {
